@@ -34,14 +34,14 @@ interface CardData {
     image: string;
     price: number;
 }
-
+  
 interface CompactCardData {
     title: string;
     price: number;
 }
 
-interface IBaseModel {
-    items: Map<string, number>;
+interface IBaseModal {
+    item: HTMLElement;
     openModal(id: string): void;
     closeModal(id: string): void;
 }

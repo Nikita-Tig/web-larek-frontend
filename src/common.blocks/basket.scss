@@ -10,13 +10,14 @@
     padding: 0;
     margin: 0;
     flex-grow: 1;
+    counter-reset: orderlist;
   }
 
   &__item {
     border-bottom: 1px solid $primary;
     padding: 1.5rem 0;
 
-    &-index {
+    &::before {
       @include mixins.flex(row);
       justify-content: center;
       align-items: center;
@@ -27,6 +28,8 @@
       background-color: $primary;
       color: white;
       margin-right: 1rem;
+      counter-increment: orderlist;
+      content: counter(orderlist);
     }
 
     &-delete {

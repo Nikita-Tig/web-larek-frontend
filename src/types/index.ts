@@ -1,21 +1,50 @@
-interface IProduct {
-    id: string;
-    description: string;
-    image: string;
-    title: string;
-    category: string;
-    price: number;
+export interface IProduct {
+	title: string;
+	description: string;
+	image: string;
+	category: string;
+	price: number;
+	id: string;
 }
 
-interface IShop {
-    cardsList: HTMLElement[];
+export interface IProductList {
+	total: number;
+	items: IProduct[];
 }
 
-interface IBasket {
-    itemsList: HTMLElement[];
-    itemsTotal: number;
+export interface IShop {
+	setCardList: HTMLElement[];
 }
 
-interface IPayment {
-    value: string;
+export interface IHeader {
+	setCounter: number;
 }
+
+export interface IBasket {
+	setItemsList: HTMLElement[];
+	setTotalPrice: number;
+	setBasketBtn: IProduct[];
+}
+
+export interface IPayment {
+	validationError: string;
+}
+
+export interface IContacts {
+	validationError: string;
+}
+
+export interface ISuccess {
+	totalDeduction: number;
+}
+
+export interface IOrder {
+	payment: string;
+	address: string;
+	email: string;
+	phone: string;
+	total: number;
+	items: string[];
+}
+
+export interface IModals {}

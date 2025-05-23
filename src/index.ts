@@ -14,7 +14,12 @@ import { ShopApi } from './components/base/shopApi';
 import { ShopModel } from './components/base/shopModel';
 import { Success } from './components/base/success';
 import './scss/styles.scss';
-import { IContacts, IContactsErrors, IOrderData, IPaymentErrors } from './types';
+import {
+	IContacts,
+	IContactsErrors,
+	IOrderData,
+	IPaymentErrors,
+} from './types';
 import { API_URL, CDN_URL } from './utils/constants';
 import { cloneTemplate } from './utils/utils';
 
@@ -95,7 +100,8 @@ events.on('modal:openPreview', ({ id }: { id: string }) => {
 		category: product.category,
 		price: product.price,
 		id: product.id,
-    buttonState: ((product === basketModel.getItem(product.id)) || product.price === null)
+		buttonState:
+			product === basketModel.getItem(product.id) || product.price === null,
 	});
 
 	modal.openModal(previewHTMLElement);
@@ -132,7 +138,7 @@ events.on('modal:close', () => {
 
 events.on('basket:add', ({ id }: { id: string }) => {
 	basketModel.addItem(shopModel.getProduct(id));
-  modal.closeModal();
+	modal.closeModal();
 });
 
 events.on('basket:delete', ({ id }: { id: string }) => {
@@ -140,7 +146,7 @@ events.on('basket:delete', ({ id }: { id: string }) => {
 });
 
 events.on('modal:openPayment', () => {
-  payment.clearInputs();
+	payment.clearInputs();
 	payment.toggleNextBtn(orderModel.validatePaymentForm());
 	modal.openModal(paymentHTMLElement);
 });
@@ -151,23 +157,31 @@ events.on('validate:paymentType', ({ btnName }: { btnName: string }) => {
 
 events.on(
 	'validate:address',
-	({ inputName, inputValue }: { inputName: keyof IOrderData, inputValue: string }) => {
-		orderModel.setInputValue(inputName, inputValue)
+	({
+		inputName,
+		inputValue,
+	}: {
+		inputName: keyof IOrderData;
+		inputValue: string;
+	}) => {
+		orderModel.setInputValue(inputName, inputValue);
 	}
 );
 
-events.on('payment:error', ( errors: IPaymentErrors ) => {
-  const {paymentError, addressError} = errors
-  const validationErrors = Object.values({paymentError, addressError}).filter(i => !!i).join('; ');
-  payment.render({
-    validationErrors: validationErrors
-  })
-  payment.toggleNextBtn(false)
+events.on('payment:error', (errors: IPaymentErrors) => {
+	const { paymentError, addressError } = errors;
+	const validationErrors = Object.values({ paymentError, addressError })
+		.filter((i) => !!i)
+		.join('; ');
+	payment.render({
+		validationErrors: validationErrors,
+	});
+	payment.toggleNextBtn(false);
 });
 
 events.on('payment:ready', () => {
-  payment.toggleNextBtn(true)
-})
+	payment.toggleNextBtn(true);
+});
 
 events.on('modal:openContacts', () => {
 	contacts.clearInputs();
@@ -177,24 +191,31 @@ events.on('modal:openContacts', () => {
 
 events.on(
 	'validate:contacts',
-	({ inputName, inputValue }: { inputName: keyof IOrderData, inputValue: string }) => {
-		orderModel.setInputValue(inputName, inputValue)
+	({
+		inputName,
+		inputValue,
+	}: {
+		inputName: keyof IOrderData;
+		inputValue: string;
+	}) => {
+		orderModel.setInputValue(inputName, inputValue);
 	}
 );
 
-events.on('contacts:error', ( errors: IContactsErrors ) => {
-  const {emailError, phoneError} = errors
-  const validationErrors = Object.values({emailError, phoneError}).filter(i => !!i).join('; ');
-  contacts.render({
-    validationErrors: validationErrors
-  })
-  contacts.toggleNextBtn(false)
-	}
-);
+events.on('contacts:error', (errors: IContactsErrors) => {
+	const { emailError, phoneError } = errors;
+	const validationErrors = Object.values({ emailError, phoneError })
+		.filter((i) => !!i)
+		.join('; ');
+	contacts.render({
+		validationErrors: validationErrors,
+	});
+	contacts.toggleNextBtn(false);
+});
 
 events.on('contacts:ready', () => {
-  contacts.toggleNextBtn(true)
-})
+	contacts.toggleNextBtn(true);
+});
 
 events.on('form:submit', () => {
 	orderModel.setTotalCost(basketModel.getTotalPrice());

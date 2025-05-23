@@ -34,14 +34,21 @@ export class Payment extends Component<IPayment> {
 		) as HTMLButtonElement;
 
 		this.cardPaymentBtn.addEventListener('click', () =>
-			this.events.emit('validate:paymentType', { btnName: this.cardPaymentBtn.name })
+			this.events.emit('validate:paymentType', {
+				btnName: this.cardPaymentBtn.name,
+			})
 		);
 		this.cashPaymentBtn.addEventListener('click', () =>
-			this.events.emit('validate:paymentType', { btnName: this.cashPaymentBtn.name })
+			this.events.emit('validate:paymentType', {
+				btnName: this.cashPaymentBtn.name,
+			})
 		);
 
 		this.addressInput.addEventListener('input', () =>
-			this.events.emit('validate:address', { inputName: this.addressInput.name, inputValue: this.addressInput.value })
+			this.events.emit('validate:address', {
+				inputName: this.addressInput.name,
+				inputValue: this.addressInput.value,
+			})
 		);
 
 		this.nextBtn.addEventListener('click', (evt) => {

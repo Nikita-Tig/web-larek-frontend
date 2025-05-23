@@ -58,11 +58,11 @@ export class CardPreview extends Component<IProduct> {
 		this.productId = value;
 	}
 
-  set buttonState(value: boolean) {
-    if (value) {
-      this.cardButton.setAttribute("disabled", "disabled");
-    } else {
-      this.cardButton.removeAttribute("disabled");
-    }
-  }
+	set buttonState(value: boolean) {
+		if (value) {
+			this.cardButton.setAttribute('disabled', 'disabled');
+		} else {
+			this.cardButton.removeAttribute('disabled');
+		}
+	}
 }

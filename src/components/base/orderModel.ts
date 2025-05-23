@@ -1,67 +1,72 @@
-import { IContacts, IOrder, IPayment, IProduct } from '../../types';
+import { IContactsErrors, IOrder, IOrderData, IPaymentErrors, IProduct } from '../../types';
 import { IEvents } from './events';
 
 export class OrderModel {
-	protected orderData: IOrder;
-	protected payment: string;
-	protected address: string;
-	protected email: string;
-	protected phone: string;
+	protected orderData: IOrderData = {
+     payment: "",
+     address: "",
+     email: "",
+     phone: "",
+
+  }
+  protected order: IOrder;
 	protected total: number;
 	protected productsId: string[];
+  protected paymentErrors: IPaymentErrors;
+  protected contactsErrors: IContactsErrors;
 
 	constructor(protected events: IEvents) {}
 
 	setPaymentType(value: string) {
 		if (value === 'cash') {
-			this.payment = 'upon receipt';
+			this.orderData.payment = 'upon receipt';
+      if (this.validatePaymentForm()){
+        this.events.emit("payment:ready")
+      }
+      return "cash"
 		} else {
-			this.payment = 'online';
+			this.orderData.payment = 'online';
+      if (this.validatePaymentForm()){
+        this.events.emit("payment:ready")
+      }
+      return "card"
 		}
 	}
 
-	validateInput(inputElement: HTMLInputElement, elementName: string): string {
-		if (!inputElement.validity.valid) {
-			switch (elementName) {
-				case 'address':
-					this.address = null;
-					break;
-				case 'email':
-					this.email = null;
-					break;
-				case 'phone':
-					this.phone = null;
-					break;
-			}
-			return inputElement.validationMessage;
-		} else {
-			switch (elementName) {
-				case 'address':
-					this.address = inputElement.value;
-					break;
-				case 'email':
-					this.email = inputElement.value;
-					break;
-				case 'phone':
-					this.phone = inputElement.value;
-					break;
-			}
-			return '';
-		}
-	}
+	setInputValue(inputName: keyof IOrderData, inputValue: string) {
+			this.orderData[inputName] = inputValue;
+      if (this.validatePaymentForm()) {
+        this.events.emit("payment:ready");
+      }
+    if (this.validateContactsForm()){
+      this.events.emit("contacts:ready");
+    }
+}
 
 	validatePaymentForm() {
-		if ((this.address && this.payment != null) || undefined) {
-			return true;
+    const errors = {} as IPaymentErrors
+    if (!this.orderData.payment) {
+      errors.paymentError = "Необходимо указать способ оплаты";
 		}
-		return false;
+    if (!this.orderData.address) {
+      errors.addressError = "Необходимо указать адрес";
+    }
+    this.paymentErrors = errors;
+		this.events.emit("payment:error", this.paymentErrors);
+    return Object.values(errors).length === 0;
 	}
 
 	validateContactsForm() {
-		if ((this.email && this.phone != null) || undefined) {
-			return true;
+    const errors = {} as IContactsErrors
+		if (!this.orderData.email) {
+      errors.emailError = "Необходимо указать email";
 		}
-		return false;
+    if (!this.orderData.phone) {
+      errors.phoneError = "Необходимо указать телефон";
+    }
+    this.contactsErrors = errors;
+		this.events.emit("contacts:error", this.contactsErrors);
+    return Object.values(errors).length === 0;
 	}
 
 	setTotalCost(value: number) {
@@ -73,21 +78,21 @@ export class OrderModel {
 		products.map((item) => this.productsId.push(item.id));
 	}
 
-	order(): IOrder {
-		const payment = this.payment;
-		const address = this.address;
-		const email = this.email;
-		const phone = this.phone;
+	setOrder(): IOrder {
+		const payment = this.orderData.payment;
+		const address = this.orderData.address;
+		const email = this.orderData.email;
+		const phone = this.orderData.phone;
 		const total = this.total;
 		const items = this.productsId;
-		return (this.orderData = { payment, address, email, phone, total, items });
+		return (this.order = { payment, address, email, phone, total, items });
 	}
 
 	clearOrder() {
-    this.payment = null;
-		this.address = null;
-		this.email = null;
-		this.phone = null;
+    this.orderData.payment = null;
+		this.orderData.address = null;
+		this.orderData.email = null;
+		this.orderData.phone = null;
 		this.total = null;
 		this.productsId = null;
 	}

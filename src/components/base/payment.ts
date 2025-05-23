@@ -34,14 +34,14 @@ export class Payment extends Component<IPayment> {
 		) as HTMLButtonElement;
 
 		this.cardPaymentBtn.addEventListener('click', () =>
-			this.events.emit('validate:paymentType', { btn: this.cardPaymentBtn })
+			this.events.emit('validate:paymentType', { btnName: this.cardPaymentBtn.name })
 		);
 		this.cashPaymentBtn.addEventListener('click', () =>
-			this.events.emit('validate:paymentType', { btn: this.cashPaymentBtn })
+			this.events.emit('validate:paymentType', { btnName: this.cashPaymentBtn.name })
 		);
 
 		this.addressInput.addEventListener('input', () =>
-			this.events.emit('validate:address', { inputElement: this.addressInput })
+			this.events.emit('validate:address', { inputName: this.addressInput.name, inputValue: this.addressInput.value })
 		);
 
 		this.nextBtn.addEventListener('click', (evt) => {
@@ -50,17 +50,17 @@ export class Payment extends Component<IPayment> {
 		});
 	}
 
-	togglePaymentBtns(btn: HTMLButtonElement) {
-		if (btn === this.cardPaymentBtn) {
-			this.toggleClass(btn, 'button_alt-active', true);
+	togglePaymentBtns(btnName: string) {
+		if (btnName === this.cardPaymentBtn.name) {
+			this.toggleClass(this.cardPaymentBtn, 'button_alt-active', true);
 			this.toggleClass(this.cashPaymentBtn, 'button_alt-active', false);
 		} else {
-			this.toggleClass(btn, 'button_alt-active', true);
+			this.toggleClass(this.cashPaymentBtn, 'button_alt-active', true);
 			this.toggleClass(this.cardPaymentBtn, 'button_alt-active', false);
 		}
 	}
 
-	set validationError(err: string) {
+	set validationErrors(err: string) {
 		this.setText(this.errorField, err);
 	}
 
@@ -75,6 +75,6 @@ export class Payment extends Component<IPayment> {
 	clearInputs() {
 		this.toggleClass(this.cashPaymentBtn, 'button_alt-active', false);
 		this.toggleClass(this.cardPaymentBtn, 'button_alt-active', false);
-		this.addressInput.value = '';
+		this.addressInput.value = null;
 	}
 }

@@ -14,6 +14,7 @@ import { ShopApi } from './components/base/shopApi';
 import { ShopModel } from './components/base/shopModel';
 import { Success } from './components/base/success';
 import './scss/styles.scss';
+import { IContacts, IContactsErrors, IOrderData, IPaymentErrors } from './types';
 import { API_URL, CDN_URL } from './utils/constants';
 import { cloneTemplate } from './utils/utils';
 
@@ -94,6 +95,7 @@ events.on('modal:openPreview', ({ id }: { id: string }) => {
 		category: product.category,
 		price: product.price,
 		id: product.id,
+    buttonState: ((product === basketModel.getItem(product.id)) || product.price === null)
 	});
 
 	modal.openModal(previewHTMLElement);
@@ -130,6 +132,7 @@ events.on('modal:close', () => {
 
 events.on('basket:add', ({ id }: { id: string }) => {
 	basketModel.addItem(shopModel.getProduct(id));
+  modal.closeModal();
 });
 
 events.on('basket:delete', ({ id }: { id: string }) => {
@@ -137,72 +140,72 @@ events.on('basket:delete', ({ id }: { id: string }) => {
 });
 
 events.on('modal:openPayment', () => {
+  payment.clearInputs();
 	payment.toggleNextBtn(orderModel.validatePaymentForm());
 	modal.openModal(paymentHTMLElement);
 });
 
-events.on('validate:paymentType', ({ btn }: { btn: HTMLButtonElement }) => {
-	orderModel.setPaymentType(btn.name);
-	payment.togglePaymentBtns(btn);
-	payment.toggleNextBtn(orderModel.validatePaymentForm());
+events.on('validate:paymentType', ({ btnName }: { btnName: string }) => {
+	payment.togglePaymentBtns(orderModel.setPaymentType(btnName));
 });
 
 events.on(
 	'validate:address',
-	({ inputElement }: { inputElement: HTMLInputElement }) => {
-		payment.render({
-			validationError: orderModel.validateInput(
-				inputElement,
-				inputElement.name
-			),
-		});
-		payment.toggleNextBtn(orderModel.validatePaymentForm());
+	({ inputName, inputValue }: { inputName: keyof IOrderData, inputValue: string }) => {
+		orderModel.setInputValue(inputName, inputValue)
 	}
 );
 
+events.on('payment:error', ( errors: IPaymentErrors ) => {
+  const {paymentError, addressError} = errors
+  const validationErrors = Object.values({paymentError, addressError}).filter(i => !!i).join('; ');
+  payment.render({
+    validationErrors: validationErrors
+  })
+  payment.toggleNextBtn(false)
+});
+
+events.on('payment:ready', () => {
+  payment.toggleNextBtn(true)
+})
+
 events.on('modal:openContacts', () => {
-	payment.clearInputs();
+	contacts.clearInputs();
 	contacts.toggleNextBtn(orderModel.validateContactsForm());
 	modal.openModal(contactsHTMLElement);
 });
 
 events.on(
-	'validate:email',
-	({ inputElement }: { inputElement: HTMLInputElement }) => {
-		contacts.render({
-			validationError: orderModel.validateInput(
-				inputElement,
-				inputElement.name
-			),
-		});
-		contacts.toggleNextBtn(orderModel.validateContactsForm());
+	'validate:contacts',
+	({ inputName, inputValue }: { inputName: keyof IOrderData, inputValue: string }) => {
+		orderModel.setInputValue(inputName, inputValue)
 	}
 );
 
-events.on(
-	'validate:phone',
-	({ inputElement }: { inputElement: HTMLInputElement }) => {
-		contacts.render({
-			validationError: orderModel.validateInput(
-				inputElement,
-				inputElement.name
-			),
-		});
-		contacts.toggleNextBtn(orderModel.validateContactsForm());
+events.on('contacts:error', ( errors: IContactsErrors ) => {
+  const {emailError, phoneError} = errors
+  const validationErrors = Object.values({emailError, phoneError}).filter(i => !!i).join('; ');
+  contacts.render({
+    validationErrors: validationErrors
+  })
+  contacts.toggleNextBtn(false)
 	}
 );
+
+events.on('contacts:ready', () => {
+  contacts.toggleNextBtn(true)
+})
 
 events.on('form:submit', () => {
 	orderModel.setTotalCost(basketModel.getTotalPrice());
 	orderModel.setItems(basketModel.getItems());
 	api
-		.sendOrder(orderModel.order())
+		.sendOrder(orderModel.setOrder())
 		.then(() => {
 			success.render({
 				totalDeduction: basketModel.getTotalPrice(),
 			});
 			basketModel.clearItems();
-			contacts.clearInputs();
 			orderModel.clearOrder();
 			modal.openModal(successHTMLElement);
 		})

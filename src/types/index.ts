@@ -5,6 +5,7 @@ export interface IProduct {
 	category: string;
 	price: number;
 	id: string;
+	buttonState?: boolean;
 }
 
 export interface IProductList {
@@ -27,24 +28,37 @@ export interface IBasket {
 }
 
 export interface IPayment {
-	validationError: string;
+	validationErrors: string;
+}
+
+export interface IPaymentErrors {
+	paymentError: string;
+	addressError: string;
 }
 
 export interface IContacts {
-	validationError: string;
+	validationErrors: string;
+}
+
+export interface IContactsErrors {
+	emailError: string;
+	phoneError: string;
 }
 
 export interface ISuccess {
 	totalDeduction: number;
 }
 
-export interface IOrder {
+export interface IOrder extends IOrderData {
+	total: number;
+	items: string[];
+}
+
+export interface IOrderData {
 	payment: string;
 	address: string;
 	email: string;
 	phone: string;
-	total: number;
-	items: string[];
 }
 
 export interface IModals {}

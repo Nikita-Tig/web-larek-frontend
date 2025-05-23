@@ -30,10 +30,10 @@ export class Contacts extends Component<IContacts> {
 		) as HTMLButtonElement;
 
 		this.emailInput.addEventListener('input', () =>
-			this.events.emit('validate:email', { inputElement: this.emailInput })
+			this.events.emit('validate:contacts', { inputName: this.emailInput.name, inputValue: this.emailInput.value })
 		);
 		this.phoneInput.addEventListener('input', () =>
-			this.events.emit('validate:phone', { inputElement: this.phoneInput })
+			this.events.emit('validate:contacts', { inputName: this.phoneInput.name, inputValue: this.phoneInput.value })
 		);
 
 		this.nextBtn.addEventListener('click', (evt) => {
@@ -42,7 +42,7 @@ export class Contacts extends Component<IContacts> {
 		});
 	}
 
-	set validationError(err: string) {
+	set validationErrors(err: string) {
 		this.setText(this.errorField, err);
 	}
 
@@ -55,7 +55,7 @@ export class Contacts extends Component<IContacts> {
 	}
 
 	clearInputs() {
-		this.emailInput.value = '';
-		this.phoneInput.value = '';
+		this.emailInput.value = null;
+		this.phoneInput.value = null;
 	}
 }
